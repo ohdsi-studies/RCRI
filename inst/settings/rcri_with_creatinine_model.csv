@@ -1,0 +1,7 @@
+"type","analysisId","covariateName","cohortId","atlasId","cohortName","startDay","endDay","count","ageInteraction","lnAgeInteraction","lnValue","aggregateMethod","imputationValue","covariateId","points"
+"cohortCovariate",456,"High risk surgery days before: -9999 days after: -1",18958,18958,"High risk surgery",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,18958456,1
+"cohortCovariate",456,"Ischemic heart disease days before: -9999 days after: -1",18950,18950,"Ischemic heart disease",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,18950456,1
+"cohortCovariate",456,"Heart failure days before: -9999 days after: -1",18951,18951,"Heart failure",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,18951456,1
+"cohortCovariate",456,"Cerebrovascular disease days before: -9999 days after: -1",18952,18952,"Cerebrovascular disease",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,18952456,1
+"cohortCovariate",456,"Insulin treatment days before: -60 days after: 60",18953,18953,"Insulin treatment",-60,60,FALSE,FALSE,FALSE,FALSE,"na",0,18953456,1
+"cohortCovariate",456,"Elevated creatinine days before: -60 days after: 60",18954,18954,"Elevated creatinine",-60,60,FALSE,FALSE,FALSE,FALSE,"na",0,18954456,1
