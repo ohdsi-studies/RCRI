@@ -5,18 +5,29 @@ CREATE TABLE #Codesets (
 ;
 
 INSERT INTO #Codesets (codeset_id, concept_id)
-SELECT 0 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
+SELECT 1 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
 ( 
-  select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (4185932)
+  select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (44784623,38001109,38001108,38001110,38001112,38001111,38001113,38001139,40761421,443563,438172,4108215,4108678,4163874,4185932,40761359,319038,4108680)
 UNION  select c.concept_id
   from @vocabulary_database_schema.CONCEPT c
   join @vocabulary_database_schema.CONCEPT_ANCESTOR ca on c.concept_id = ca.descendant_concept_id
-  and ca.ancestor_concept_id in (4185932)
+  and ca.ancestor_concept_id in (44784623,38001109,38001108,38001110,38001112,38001111,38001113,38001139,40761421,443563,438172,4108215,4108678,4163874,4185932,40761359,319038,4108680)
   and c.invalid_reason is null
 
 ) I
-) C
-;
+LEFT JOIN
+(
+  select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (315830)
+UNION  select c.concept_id
+  from @vocabulary_database_schema.CONCEPT c
+  join @vocabulary_database_schema.CONCEPT_ANCESTOR ca on c.concept_id = ca.descendant_concept_id
+  and ca.ancestor_concept_id in (315830)
+  and c.invalid_reason is null
+
+) E ON I.concept_id = E.concept_id
+WHERE E.concept_id is null
+) C;
+
 
 with primary_events (event_id, person_id, start_date, end_date, op_start_date, op_end_date, visit_occurrence_id) as
 (
@@ -37,11 +48,26 @@ FROM
 (
   SELECT co.* 
   FROM @cdm_database_schema.CONDITION_OCCURRENCE co
-  JOIN #Codesets codesets on ((co.condition_concept_id = codesets.concept_id and codesets.codeset_id = 0))
+  JOIN #Codesets codesets on ((co.condition_concept_id = codesets.concept_id and codesets.codeset_id = 1))
 ) C
 
 
 -- End Condition Occurrence Criteria
+
+UNION ALL
+-- Begin Observation Criteria
+select C.person_id, C.observation_id as event_id, C.observation_date as start_date, DATEADD(d,1,C.observation_date) as END_DATE,
+       C.observation_concept_id as TARGET_CONCEPT_ID, C.visit_occurrence_id,
+       C.observation_date as sort_date
+from 
+(
+  select o.* 
+  FROM @cdm_database_schema.OBSERVATION o
+JOIN #Codesets codesets on ((o.observation_concept_id = codesets.concept_id and codesets.codeset_id = 1))
+) C
+
+
+-- End Observation Criteria
 
   ) E
 	JOIN @cdm_database_schema.observation_period OP on E.person_id = OP.person_id and E.start_date >=  OP.observation_period_start_date and E.start_date <= op.observation_period_end_date
@@ -188,4 +214,3 @@ DROP TABLE #included_events;
 
 TRUNCATE TABLE #Codesets;
 DROP TABLE #Codesets;
-

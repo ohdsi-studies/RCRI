@@ -5,18 +5,18 @@ CREATE TABLE #Codesets (
 ;
 
 INSERT INTO #Codesets (codeset_id, concept_id)
-SELECT 0 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
+SELECT 1 as codeset_id, c.concept_id FROM (select distinct I.concept_id FROM
 ( 
-  select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (443454,381591,4143274,439847,434056)
+  select concept_id from @vocabulary_database_schema.CONCEPT where concept_id in (439037,443551,443454,381591,4143274,439847,434056,43530606,4112026,4111721,4111720,443605,376714)
 UNION  select c.concept_id
   from @vocabulary_database_schema.CONCEPT c
   join @vocabulary_database_schema.CONCEPT_ANCESTOR ca on c.concept_id = ca.descendant_concept_id
-  and ca.ancestor_concept_id in (443454,381591,4143274,439847,434056)
+  and ca.ancestor_concept_id in (439037,443551,443454,381591,4143274,439847,434056,43530606,4112026,4111721,4111720,443605,376714)
   and c.invalid_reason is null
 
 ) I
-) C
-;
+) C;
+
 
 with primary_events (event_id, person_id, start_date, end_date, op_start_date, op_end_date, visit_occurrence_id) as
 (
@@ -37,7 +37,7 @@ FROM
 (
   SELECT co.* 
   FROM @cdm_database_schema.CONDITION_OCCURRENCE co
-  JOIN #Codesets codesets on ((co.condition_concept_id = codesets.concept_id and codesets.codeset_id = 0))
+  JOIN #Codesets codesets on ((co.condition_concept_id = codesets.concept_id and codesets.codeset_id = 1))
 ) C
 
 
@@ -52,7 +52,7 @@ from
 (
   select o.* 
   FROM @cdm_database_schema.OBSERVATION o
-JOIN #Codesets codesets on ((o.observation_concept_id = codesets.concept_id and codesets.codeset_id = 0))
+JOIN #Codesets codesets on ((o.observation_concept_id = codesets.concept_id and codesets.codeset_id = 1))
 ) C
 
 
@@ -203,4 +203,3 @@ DROP TABLE #included_events;
 
 TRUNCATE TABLE #Codesets;
 DROP TABLE #Codesets;
-

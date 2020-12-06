@@ -26,8 +26,8 @@ UNION  select c.concept_id
 
 ) E ON I.concept_id = E.concept_id
 WHERE E.concept_id is null
-) C
-;
+) C;
+
 
 with primary_events (event_id, person_id, start_date, end_date, op_start_date, op_end_date, visit_occurrence_id) as
 (
@@ -199,4 +199,3 @@ DROP TABLE #included_events;
 
 TRUNCATE TABLE #Codesets;
 DROP TABLE #Codesets;
-

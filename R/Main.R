@@ -36,7 +36,8 @@
 #'                             priviliges for storing temporary tables.
 #' @param setting              A data.frame with the tId, oId, model triplets to run - if NULL it runs all possible combinations                
 #' @param sampleSize           How many patients to sample from the target population 
-#' @param recalibrate          Recalibrate for the new population?                            
+#' @param recalibrate          Recalibrate intercept and gradient for the new population?    
+#' @param recalibrateIntercept Recalibrate intercept only for the new population?                           
 #' @param riskWindowStart      The start of the risk window (in days) relative to the startAnchor.                           
 #' @param startAnchor          The anchor point for the start of the risk window. Can be "cohort start" or "cohort end".
 #' @param riskWindowEnd        The end of the risk window (in days) relative to the endAnchor parameter
@@ -106,6 +107,7 @@ execute <- function(connectionDetails,
                     setting = NULL,
                     sampleSize = NULL,
                     recalibrate = F, 
+                    recalibrateIntercept = F,
                     riskWindowStart = 1,
                     startAnchor = 'cohort start',
                     riskWindowEnd = 365,
@@ -247,6 +249,54 @@ execute <- function(connectionDetails,
             result$covariateSummary <- tryCatch({PatientLevelPrediction:::covariateSummary(plpData = plpData, population = population, model = plpModel)},
                                                 error = function(e){ParallelLogger::logError(e); return(NULL)})
             
+            # add age and gender to summary
+            if(!is.null(result$covariateSummary)){
+              
+              sums <- result$prediction %>% dplyr::group_by(outcomeCount) %>%
+                dplyr::summarise(meanAge = mean(ageYear), sdAge = sd(ageYear),
+                                 malePer = sum(gender!=8532)/length(gender)*100, N = length(gender))
+              
+              asums <- result$prediction %>% 
+                dplyr::summarise(meanAge = mean(ageYear), sdAge = sd(ageYear),
+                                 malePer = sum(gender!=8532)/length(gender)*100, N = length(gender))
+              
+              ageResults <- data.frame(covariateId = -1,
+                                       covariateName = 'Age in years',
+                                       analysisId = -1,
+                                       conceptId = -1,
+                                       covariateValue = 0,
+                                       CovariateCount = sum(sums$N),
+                                       CovariateMean = asums$meanAge,
+                                       CovariateStDev = asums$sdAge,
+                                       CovariateCountWithNoOutcome = sums$N[sums$outcomeCount==0],
+                                       CovariateMeanWithNoOutcome = sums$meanAge[sums$outcomeCount==0],
+                                       CovariateStDevWithNoOutcome = sums$sdAge[sums$outcomeCount==0],
+                                       CovariateCountWithOutcome = sums$N[sums$outcomeCount==1],
+                                       CovariateMeanWithOutcome = sums$meanAge[sums$outcomeCount==1],
+                                       CovariateStDevWithOutcome = sums$sdAge[sums$outcomeCount==1],
+                                       StandardizedMeanDiff = 0)
+              
+              genderResults <- data.frame(covariateId = -1,
+                                          covariateName = 'Male (%)',
+                                          analysisId = -1,
+                                          conceptId = -1,
+                                          covariateValue = 0,
+                                          CovariateCount = sum(sums$N),
+                                          CovariateMean = asums$malePer,
+                                          CovariateStDev = 0,
+                                          CovariateCountWithNoOutcome = sums$N[sums$outcomeCount==0],
+                                          CovariateMeanWithNoOutcome = sums$malePer[sums$outcomeCount==0],
+                                          CovariateStDevWithNoOutcome = 0,
+                                          CovariateCountWithOutcome = sums$N[sums$outcomeCount==1],
+                                          CovariateMeanWithOutcome = sums$malePer[sums$outcomeCount==1],
+                                          CovariateStDevWithOutcome = 0,
+                                          StandardizedMeanDiff = 0)
+              
+              
+              result$covariateSummary <- rbind(result$covariateSummary, genderResults, ageResults)
+              
+            }
+            
             
             if(recalibrate){
               # add code here
@@ -274,6 +324,34 @@ execute <- function(connectionDetails,
                               c(analysisId,"validation","gradient",refit$coefficients[2]))
               result$performanceEvaluation$evaluationStatistics <- rbind(result$performanceEvaluation$evaluationStatistics,extras)
               
+            }
+            
+            if(recalibrateIntercept){
+              # add code here
+              predictionWeak <- result$prediction
+              predictionWeak$value[predictionWeak$value==0] <- 0.000000000000001
+              predictionWeak$value[predictionWeak$value==1] <- 1-0.000000000000001
+              inverseLog <- log(predictionWeak$value/(1-predictionWeak$value))
+              y <- ifelse(predictionWeak$outcomeCount>0,1,0)
+              #### Intercept + Slope recalibration
+              
+              
+              refit <- suppressWarnings(stats::glm(y ~ offset(1*inverseLog), family = 'binomial'))
+              inverseLogRecal<-inverseLog+refit$coefficients[1]
+              predictionWeak$value <- 1/(1+exp(-1*(inverseLogRecal)))
+              
+              result$prediction <- predictionWeak
+              performance <- PatientLevelPrediction::evaluatePlp(result$prediction, plpData)
+              
+              # reformatting the performance 
+              analysisId <-   analysisSettings$analysisId[i]
+              performance <- reformatePerformance(performance,analysisId)
+              
+              result$performanceEvaluation <- performance
+              
+              #save the values
+              extras <- rbind(c(analysisId,"validation","intercept",refit$coefficients[1]))
+              result$performanceEvaluation$evaluationStatistics <- rbind(result$performanceEvaluation$evaluationStatistics,extras)
             }
             
             

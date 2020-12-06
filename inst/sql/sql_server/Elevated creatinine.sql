@@ -15,8 +15,8 @@ UNION  select c.concept_id
   and c.invalid_reason is null
 
 ) I
-) C
-;
+) C;
+
 
 with primary_events (event_id, person_id, start_date, end_date, op_start_date, op_end_date, visit_occurrence_id) as
 (
@@ -40,7 +40,7 @@ from
 JOIN #Codesets codesets on ((m.measurement_concept_id = codesets.concept_id and codesets.codeset_id = 0))
 ) C
 
-WHERE (C.value_as_number >= 2.0000 and C.value_as_number <= 10.0000)
+WHERE (C.value_as_number >= 2.0000 and C.value_as_number <= 20.0000)
 AND C.unit_concept_id in (8840,8954,9028)
 -- End Measurement Criteria
 
@@ -56,7 +56,7 @@ from
 JOIN #Codesets codesets on ((m.measurement_concept_id = codesets.concept_id and codesets.codeset_id = 0))
 ) C
 
-WHERE (C.value_as_number >= 20.0000 and C.value_as_number <= 100.0000)
+WHERE (C.value_as_number >= 20.0000 and C.value_as_number <= 200.0000)
 AND C.unit_concept_id in (8751)
 -- End Measurement Criteria
 
@@ -72,7 +72,7 @@ from
 JOIN #Codesets codesets on ((m.measurement_concept_id = codesets.concept_id and codesets.codeset_id = 0))
 ) C
 
-WHERE (C.value_as_number >= 176.0000 and C.value_as_number <= 300.0000)
+WHERE (C.value_as_number >= 176.0000 and C.value_as_number <= 1776.0000)
 AND C.unit_concept_id in (8749)
 -- End Measurement Criteria
 
@@ -123,7 +123,7 @@ FROM cteIncludedEvents Results
 -- date offset strategy
 
 select event_id, person_id, 
-  case when DATEADD(day,30,start_date) > start_date then DATEADD(day,30,start_date) else start_date end as end_date
+  case when DATEADD(day,365,start_date) > start_date then DATEADD(day,365,start_date) else start_date end as end_date
 INTO #strategy_ends
 from #included_events;
 
@@ -134,6 +134,77 @@ with cohort_ends (event_id, person_id, end_date) as
 	-- cohort exit dates
   -- End Date Strategy
 SELECT event_id, person_id, end_date from #strategy_ends
+
+UNION ALL
+-- Censor Events
+select i.event_id, i.person_id, MIN(c.start_date) as end_date
+FROM #included_events i
+JOIN
+(
+-- Begin Measurement Criteria
+select C.person_id, C.measurement_id as event_id, C.measurement_date as start_date, DATEADD(d,1,C.measurement_date) as END_DATE,
+       C.measurement_concept_id as TARGET_CONCEPT_ID, C.visit_occurrence_id,
+       C.measurement_date as sort_date
+from 
+(
+  select m.* 
+  FROM @cdm_database_schema.MEASUREMENT m
+JOIN #Codesets codesets on ((m.measurement_concept_id = codesets.concept_id and codesets.codeset_id = 0))
+) C
+
+WHERE (C.value_as_number >= 0.1000 and C.value_as_number <= 1.9900)
+AND C.unit_concept_id in (8840,8954,9028)
+-- End Measurement Criteria
+
+) C on C.person_id = I.person_id and C.start_date >= I.start_date and C.START_DATE <= I.op_end_date
+GROUP BY i.event_id, i.person_id
+
+UNION ALL
+select i.event_id, i.person_id, MIN(c.start_date) as end_date
+FROM #included_events i
+JOIN
+(
+-- Begin Measurement Criteria
+select C.person_id, C.measurement_id as event_id, C.measurement_date as start_date, DATEADD(d,1,C.measurement_date) as END_DATE,
+       C.measurement_concept_id as TARGET_CONCEPT_ID, C.visit_occurrence_id,
+       C.measurement_date as sort_date
+from 
+(
+  select m.* 
+  FROM @cdm_database_schema.MEASUREMENT m
+JOIN #Codesets codesets on ((m.measurement_concept_id = codesets.concept_id and codesets.codeset_id = 0))
+) C
+
+WHERE (C.value_as_number >= 1.0000 and C.value_as_number <= 19.9900)
+AND C.unit_concept_id in (8751)
+-- End Measurement Criteria
+
+) C on C.person_id = I.person_id and C.start_date >= I.start_date and C.START_DATE <= I.op_end_date
+GROUP BY i.event_id, i.person_id
+
+UNION ALL
+select i.event_id, i.person_id, MIN(c.start_date) as end_date
+FROM #included_events i
+JOIN
+(
+-- Begin Measurement Criteria
+select C.person_id, C.measurement_id as event_id, C.measurement_date as start_date, DATEADD(d,1,C.measurement_date) as END_DATE,
+       C.measurement_concept_id as TARGET_CONCEPT_ID, C.visit_occurrence_id,
+       C.measurement_date as sort_date
+from 
+(
+  select m.* 
+  FROM @cdm_database_schema.MEASUREMENT m
+JOIN #Codesets codesets on ((m.measurement_concept_id = codesets.concept_id and codesets.codeset_id = 0))
+) C
+
+WHERE (C.value_as_number >= 8.8000 and C.value_as_number <= 175.0000)
+AND C.unit_concept_id in (8749)
+-- End Measurement Criteria
+
+) C on C.person_id = I.person_id and C.start_date >= I.start_date and C.START_DATE <= I.op_end_date
+GROUP BY i.event_id, i.person_id
+
 
 ),
 first_ends (person_id, start_date, end_date) as
@@ -230,4 +301,3 @@ DROP TABLE #included_events;
 
 TRUNCATE TABLE #Codesets;
 DROP TABLE #Codesets;
-

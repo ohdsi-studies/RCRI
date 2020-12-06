@@ -1,7 +1,7 @@
 "type","analysisId","covariateName","cohortId","atlasId","cohortName","startDay","endDay","count","ageInteraction","lnAgeInteraction","lnValue","aggregateMethod","imputationValue","covariateId","points"
-"cohortCovariate",456,"High risk surgery days before: -9999 days after: -1",18958,18958,"High risk surgery",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,18958456,1
-"cohortCovariate",456,"Ischemic heart disease days before: -9999 days after: -1",18950,18950,"Ischemic heart disease",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,18950456,1
-"cohortCovariate",456,"Heart failure days before: -9999 days after: -1",18951,18951,"Heart failure",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,18951456,1
-"cohortCovariate",456,"Cerebrovascular disease days before: -9999 days after: -1",18952,18952,"Cerebrovascular disease",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,18952456,1
-"cohortCovariate",456,"Insulin treatment days before: -60 days after: 60",18953,18953,"Insulin treatment",-60,60,FALSE,FALSE,FALSE,FALSE,"na",0,18953456,1
-"cohortCovariate",456,"Elevated creatinine or renal impairment days before: -60 days after: 60",18955,18955,"Elevated creatinine or renal impairment",-60,60,FALSE,FALSE,FALSE,FALSE,"na",0,18955456,1
+"cohortCovariate",456,"High risk surgery days before: 0 days after: 0",1374,1374,"High risk surgery",0,0,FALSE,FALSE,FALSE,FALSE,"na",0,1374456,1
+"cohortCovariate",456,"Ischemic heart disease days before: -9999 days after: -1",1293,1293,"Ischemic heart disease",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,1293456,1
+"cohortCovariate",456,"Heart failure days before: -9999 days after: -1",1292,1292,"Heart failure",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,1292456,1
+"cohortCovariate",456,"Cerebrovascular disease days before: -9999 days after: -1",1287,1287,"Cerebrovascular disease",-9999,-1,FALSE,FALSE,FALSE,FALSE,"na",0,1287456,1
+"cohortCovariate",456,"Insulin treatment days before: -60 days after: 0",1291,1291,"Insulin treatment",-60,0,FALSE,FALSE,FALSE,FALSE,"na",0,1291456,1
+"cohortCovariate",456,"Elevated creatinine or renal impairment days before: -30 days after: 0",1343,1343,"Elevated creatinine or renal impairment",-30,0,FALSE,FALSE,FALSE,FALSE,"na",0,1343456,1

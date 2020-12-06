@@ -1,5 +1,4 @@
 "cohortId","atlasId","name","type"
-18947,18947,"RCRI target requiring creatinine value","target"
-18948,18948,"RCRI target without creatinine value","target"
-18935,18935,"Acute myocardial infarction events","outcome"
-18949,18949,"Earliest of AMI cardiac arrest or death","outcome"
+1373,1373,"Combination of major surgery inpatient","target"
+1455,1455,"Combination of major surgery inpatient with creatinine","target"
+1456,1456,"Earliest of AMI cardiac arrest or death","outcome"
