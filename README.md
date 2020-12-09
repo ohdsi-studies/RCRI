@@ -12,7 +12,7 @@ RCRI model validation study
 - Study end date: **2020-11-01**
 - Protocol: **Coming Soon**
 - Publications: **Coming Soon**
-- Results explorer: **Coming Soon**
+- Results explorer: [shiny app](https://data.ohdsi.org/RCRIvalidation/)
 
 The objective of this study is to preform a large-scale external validation of the RCRI prognostic model across the OHDSI network using OMOP CDM data
 
