@@ -31,8 +31,13 @@ oracleTempSchema <- NULL
 # table name where the cohorts will be generated
 cohortTable <- 'RCRICohort'
 
-# TAR settings
+# if you have big data you can pick a random sample 
+# for speed (doesn't really speed much up validaition)
+# so recommend keeping as NULL (no sample)
 sampleSize <- NULL
+
+# TAR settings 
+# ========= Recommended to not edit this =========
 riskWindowStart <- 1
 startAnchor <- 'cohort start'
 riskWindowEnd <- 30
@@ -43,9 +48,7 @@ priorOutcomeLookback <- 99999
 requireTimeAtRisk <- F
 minTimeAtRisk <- 1
 includeAllOutcomes <- T
-
-
-#=======================
+# ========= Recommended to not edit this =========
 
 execute(connectionDetails = connectionDetails,
         cdmDatabaseSchema = cdmDatabaseSchema,

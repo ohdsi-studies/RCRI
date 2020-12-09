@@ -68,6 +68,25 @@ oracleTempSchema <- NULL
 # table name where the cohorts will be generated
 cohortTable <- 'RCRICohort'
 
+# if you have big data you can pick a random sample 
+# for speed (doesn't really speed much up validaition)
+# so recommend keeping as NULL (no sample)
+sampleSize <- NULL
+
+# TAR settings 
+# ========= Recommended to not edit this =========
+riskWindowStart <- 1
+startAnchor <- 'cohort start'
+riskWindowEnd <- 30
+endAnchor <- 'cohort start'
+firstExposureOnly <- F
+removeSubjectsWithPriorOutcome <- T
+priorOutcomeLookback <- 99999
+requireTimeAtRisk <- F
+minTimeAtRisk <- 1
+includeAllOutcomes <- T
+# ========= Recommended to not edit this =========
+
 execute(connectionDetails = connectionDetails,
         cdmDatabaseSchema = cdmDatabaseSchema,
         cdmDatabaseName = cdmDatabaseName,
@@ -161,6 +180,12 @@ execute(connectionDetails = connectionDetails,
         verbosity = "INFO",
         cdmVersion = 5)
 ```
+
+# Output
+After running the code go to the location you specified as outputFolder. Inside this location you should see three folders starting with the value you specified as cdmDatabaseName.  For example if I set cdmDatabaseName = 'testData' then I would see: 'testData', 'testData_recalibrate' and 'teatData_recalibrate' folders. In addition there should be three zipped files for these three folders. Continuing the example, then I would see: 'testData.zip', 'testData_recalibrate.zip' and 'teatData_recalibrate.zip' files.  These are the results to be shared.  We recommend that you inspect the files before sending to make sure you are happy.  They will contain various csv files that can be opened and inspected.result 
+
+
+
 # Development status
 Under development.
 
