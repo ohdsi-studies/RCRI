@@ -1,7 +1,7 @@
 RCRI model validation study
 =============
 
-<img src="https://img.shields.io/badge/Study%20Status-Started-blue.svg" alt="Study Status: Started"> 
+<img src="https://img.shields.io/badge/Study%20Status-Design%20Finalized-brightgreen.svg" alt="Study Status: Design Finalized">
 
 - Analytics use case(s): **Patient-Level Prediction**
 - Study type: **Clinical Application**
@@ -19,7 +19,7 @@ The objective of this study is to preform a large-scale external validation of t
 Instructions To Install and Run Package From Github
 ===================
 
-- Make sure you have PatientLevelPrediction installed:
+- Make sure you have PatientLevelPrediction installed (this requires having Java installed and the OHDSI FeatureExtraction R package installed):
 
 ```r
   # get the latest PatientLevelPrediction
@@ -68,54 +68,98 @@ oracleTempSchema <- NULL
 # table name where the cohorts will be generated
 cohortTable <- 'RCRICohort'
 
-# TAR settings
-sampleSize <- NULL
-riskWindowStart <- 1
-startAnchor <- 'cohort start'
-riskWindowEnd <- 2*365
-endAnchor <- 'cohort start'
-firstExposureOnly <- F
-removeSubjectsWithPriorOutcome <- T
-priorOutcomeLookback <- 99999
-requireTimeAtRisk <- F
-minTimeAtRisk <- 1
-includeAllOutcomes <- T
+execute(connectionDetails = connectionDetails,
+        cdmDatabaseSchema = cdmDatabaseSchema,
+        cdmDatabaseName = cdmDatabaseName,
+        cohortDatabaseSchema = cohortDatabaseSchema,
+        cohortTable = cohortTable,
+        setting = data.frame(tId = c(1455,1373), 
+                             oId = rep(1456,2), 
+                             model = c('rcri_with_creatinine_model.csv',
+                                       'rcri_with_creatinine_plus_renal_model.csv')
+        ),
+        sampleSize = sampleSize, 
+        recalibrate = F,
+        riskWindowStart = riskWindowStart,
+        startAnchor = startAnchor,
+        riskWindowEnd = riskWindowEnd,
+        endAnchor = endAnchor,
+        firstExposureOnly = firstExposureOnly,
+        removeSubjectsWithPriorOutcome = removeSubjectsWithPriorOutcome,
+        priorOutcomeLookback = priorOutcomeLookback,
+        requireTimeAtRisk = requireTimeAtRisk,
+        minTimeAtRisk = minTimeAtRisk,
+        includeAllOutcomes = includeAllOutcomes,
+        outputFolder = outputFolder,
+        createCohorts = T,
+        runAnalyses = T,
+        viewShiny = F,
+        packageResults = T, 
+        minCellCount= 5,
+        verbosity = "INFO",
+        cdmVersion = 5)
 
+execute(connectionDetails = connectionDetails,
+        cdmDatabaseSchema = cdmDatabaseSchema,
+        cdmDatabaseName = paste0(cdmDatabaseName, '_recalibrate'),
+        cohortDatabaseSchema = cohortDatabaseSchema,
+        cohortTable = cohortTable,
+        setting = data.frame(tId = c(1455,1373), 
+                             oId = rep(1456,2), 
+                             model = c('rcri_with_creatinine_model.csv',
+                                       'rcri_with_creatinine_plus_renal_model.csv')
+        ),
+        sampleSize = sampleSize, 
+        recalibrate = T,
+        riskWindowStart = riskWindowStart,
+        startAnchor = startAnchor,
+        riskWindowEnd = riskWindowEnd,
+        endAnchor = endAnchor,
+        firstExposureOnly = firstExposureOnly,
+        removeSubjectsWithPriorOutcome = removeSubjectsWithPriorOutcome,
+        priorOutcomeLookback = priorOutcomeLookback,
+        requireTimeAtRisk = requireTimeAtRisk,
+        minTimeAtRisk = minTimeAtRisk,
+        includeAllOutcomes = includeAllOutcomes,
+        outputFolder = outputFolder,
+        createCohorts = F,
+        runAnalyses = T,
+        viewShiny = F,
+        packageResults = T, 
+        minCellCount= 5,
+        verbosity = "INFO",
+        cdmVersion = 5)
 
-#=======================
-
-RCRI::execute(connectionDetails = connectionDetails,
-                         cdmDatabaseSchema = cdmDatabaseSchema,
-                         cdmDatabaseName = cdmDatabaseName,
-                         cohortDatabaseSchema = cohortDatabaseSchema,
-                         cohortTable = cohortTable,
-                         setting = data.frame(tId = rep(c(18947, 18948),2), 
-                                                        oId = c(rep(18935,2),rep(18949,2)), 
-                                                        model = c('rcri_with_creatinine_model.csv',
-                                                                      'rcri_with_creatinine_plus_renal_model.csv',
-                                                                      'rcri_with_creatinine_model.csv',
-                                                                      'rcri_with_creatinine_plus_renal_model.csv')
-                         ),
-                         sampleSize = sampleSize, 
-                         recalibrate = T,
-                         riskWindowStart = riskWindowStart,
-                         startAnchor = startAnchor,
-                         riskWindowEnd = riskWindowEnd,
-                         endAnchor = endAnchor,
-                         firstExposureOnly = firstExposureOnly,
-                         removeSubjectsWithPriorOutcome = removeSubjectsWithPriorOutcome,
-                         priorOutcomeLookback = priorOutcomeLookback,
-                         requireTimeAtRisk = requireTimeAtRisk,
-                         minTimeAtRisk = minTimeAtRisk,
-                         includeAllOutcomes = includeAllOutcomes,
-                         outputFolder = outputFolder,
-                         createCohorts = T,
-                         runAnalyses = T,
-                         viewShiny = T,
-                         packageResults = T, 
-                         minCellCount= 5,
-                         verbosity = "INFO",
-                         cdmVersion = 5)
+execute(connectionDetails = connectionDetails,
+        cdmDatabaseSchema = cdmDatabaseSchema,
+        cdmDatabaseName = paste0(cdmDatabaseName, '_recalibrateIntercept'),
+        cohortDatabaseSchema = cohortDatabaseSchema,
+        cohortTable = cohortTable,
+        setting = data.frame(tId = c(1455,1373), 
+                             oId = rep(1456,2), 
+                             model = c('rcri_with_creatinine_model.csv',
+                                       'rcri_with_creatinine_plus_renal_model.csv')
+        ),
+        sampleSize = sampleSize, 
+        recalibrateIntercept = T,
+        riskWindowStart = riskWindowStart,
+        startAnchor = startAnchor,
+        riskWindowEnd = riskWindowEnd,
+        endAnchor = endAnchor,
+        firstExposureOnly = firstExposureOnly,
+        removeSubjectsWithPriorOutcome = removeSubjectsWithPriorOutcome,
+        priorOutcomeLookback = priorOutcomeLookback,
+        requireTimeAtRisk = requireTimeAtRisk,
+        minTimeAtRisk = minTimeAtRisk,
+        includeAllOutcomes = includeAllOutcomes,
+        outputFolder = outputFolder,
+        createCohorts = F,
+        runAnalyses = T,
+        viewShiny = F, 
+        packageResults = T, 
+        minCellCount= 5,
+        verbosity = "INFO",
+        cdmVersion = 5)
 ```
 # Development status
 Under development.
