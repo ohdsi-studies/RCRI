@@ -354,6 +354,10 @@ execute <- function(connectionDetails,
               result$performanceEvaluation$evaluationStatistics <- rbind(result$performanceEvaluation$evaluationStatistics,extras)
             }
             
+            # add netben
+            nb <- tryCatch({dca(data = result$prediction, outcome = 'outcomeCount', predictors = 'value')},
+                           error = function(e){ParallelLogger::logError(e); return(NULL)})
+            
             
             
             if(!dir.exists(file.path(outputFolder,cdmDatabaseName))){
@@ -361,6 +365,7 @@ execute <- function(connectionDetails,
             }
             ParallelLogger::logInfo("Saving results")
             PatientLevelPrediction::savePlpResult(result, file.path(outputFolder,cdmDatabaseName,analysisSettings$analysisId[i], 'plpResult'))
+            saveRDS(nb, file.path(outputFolder,cdmDatabaseName,analysisSettings$analysisId[i], 'plpResult','nb.rds'))
             ParallelLogger::logInfo(paste0("Results saved to:",file.path(outputFolder,cdmDatabaseName,analysisSettings$analysisId[i])))
             
           } # result not null

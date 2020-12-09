@@ -1,3 +1,5 @@
+
+
 # Copyright 2020 Observational Health Data Sciences and Informatics
 #
 # This file is part of RCRI
@@ -47,6 +49,11 @@ packageResults <- function(outputFolder,
     # loads analysis results
     if(dir.exists(file.path(outputFolder,folder, 'plpResult'))){
       plpResult <- PatientLevelPrediction::loadPlpResult(file.path(outputFolder,folder, 'plpResult'))
+      
+      if(file.exists(file.path(outputFolder,folder, 'plpResult','nb.rds'))){
+        nb <- readRDS(file.path(outputFolder,folder, 'plpResult','nb.rds'))
+        write.csv(nb, file.path(exportFolder,folder,'nb.csv'), row.names = F)
+      }
       
       plpResult$model$predict <- NULL
       cvst <- plpResult$inputSetting$dataExtrractionSettings$covariateSettings
