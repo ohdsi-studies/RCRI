@@ -355,7 +355,8 @@ execute <- function(connectionDetails,
             }
             
             # add netben
-            nb <- tryCatch({dca(data = result$prediction, outcome = 'outcomeCount', predictors = 'value')},
+            nb <- tryCatch({dca(data = result$prediction, outcome = 'outcomeCount', predictors = 'value',
+                                xstart = 0.001, xstop = max(result$prediction$value), xby = 0.001)},
                            error = function(e){ParallelLogger::logError(e); return(NULL)})
             
             
@@ -365,7 +366,7 @@ execute <- function(connectionDetails,
             }
             ParallelLogger::logInfo("Saving results")
             PatientLevelPrediction::savePlpResult(result, file.path(outputFolder,cdmDatabaseName,analysisSettings$analysisId[i], 'plpResult'))
-            saveRDS(nb, file.path(outputFolder,cdmDatabaseName,analysisSettings$analysisId[i], 'plpResult','nb.rds'))
+            saveRDS(nb$net.benefit, file.path(outputFolder,cdmDatabaseName,analysisSettings$analysisId[i], 'plpResult','nb.rds'))
             ParallelLogger::logInfo(paste0("Results saved to:",file.path(outputFolder,cdmDatabaseName,analysisSettings$analysisId[i])))
             
           } # result not null
